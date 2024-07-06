@@ -1,0 +1,44 @@
+---
+title: "Notebook of code to fit new ZI approaches to the Trajan data in: Modelling excess zeros in count data: A new perspective on modelling approaches by Haslett et al"
+output: html_notebook
+---
+
+```{r, include = FALSE}
+# Boiler plate code.
+rm(list = ls())
+library(ggplot2)
+theme_set(theme_bw())
+```
+
+Read in the data:
+```{r}
+trajan <- as.data.frame(readRDS('trajan_recoded.rds'))
+```
+
+Source in our helper ZI functions:
+```{r}
+source('ZI.R')
+```
+
+Fit various models:
+```{r, results='hide', message=FALSE}
+# Standard Poisson
+trajan_po <- glm(nshoots ~ 0 + period3 : hormone3, data = trajan, family = poisson)
+# NB-lin (called NBII by gamlss)
+trajan_nblin <- gamlss(nshoots ~ 0 + period3 : hormone3, data = trajan, family = NBII)
+# NB-quad (called NBI by gamlss)
+trajan_nbquad <- gamlss(nshoots ~ 0 + period3 : hormone3, data = trajan, family = NBI)
+# ZI types A to D
+trajan_po_typeA <- ZI(nshoots ~ 0 + period3 : hormone3, data = trajan, ZI_type = "A", family = "poisson")
+trajan_po_typeB <- ZI(nshoots ~ 0 + period3 : hormone3, data = trajan, ZI_type = "B", family = "poisson")
+trajan_po_typeC <- ZI(nshoots ~ 0 + period3 : hormone3, data = trajan, ZI_type = "C", family = "poisson")
+trajan_po_typeD <- ZI(nshoots ~ 0 + period3 : hormone3, data = trajan, ZI_type = "D", family = "poisson")
+```
+
+Summarise the models, e.g. for Type D:
+
+```{r}
+trajan_po_typeD %>% print
+```
+
+See the other functions in the repository for a more detailed set of calculations and plots that are possible
